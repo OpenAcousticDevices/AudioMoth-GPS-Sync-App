@@ -434,7 +434,7 @@ electron.ipcRenderer.on('update-check', function () {
 
             console.error(response.error);
 
-            dialog.showMessageBox(currentWindow.getFocusedWindow(), {
+            dialog.showMessageBox(currentWindow, {
                 type: 'error',
                 title: 'Failed to check for updates',
                 message: response.error
@@ -446,7 +446,7 @@ electron.ipcRenderer.on('update-check', function () {
 
         if (response.updateNeeded === false) {
 
-            dialog.showMessageBox(currentWindow.getFocusedWindow(), {
+            dialog.showMessageBox(currentWindow, {
                 type: 'info',
                 buttons: ['OK'],
                 title: 'Update not needed',
