@@ -24,7 +24,7 @@ This will place a packaged version of the app and an installer for the platform 
 For detailed usage instructions of the app itself and to download prebuilt installers of the latest stable version for all platforms, visit the app support site [here](https://www.openacousticdevices.info/labs).
 
 ### Related Repositories ###
-* [AudioMoth Time App](https://github.com/OpenAcousticDevices/AudioMoth-GPS-Sync)
+* [AudioMoth-GPS-Sync](https://github.com/OpenAcousticDevices/AudioMoth-GPS-Sync)
 
 ### License ###
 
