@@ -1,0 +1,78 @@
+{
+  "name": "AudioMoth-Sync",
+  "version": "1.0.0",
+  "description": "The file synchronisation app for recordings made using the AudioMoth-GPS-Sync firmware.",
+  "main": "main.js",
+  "author": "openacousticdevices.info",
+  "license": "ISC",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/OpenAcousticDevices/AudioMoth-GPS-Sync-App.git"
+  },
+  "scripts": {
+    "postinstall": "install-app-deps",
+    "start": "electron .",
+    "dist": "node builder.js"
+  },
+  "build": {
+    "asar": {
+      "smartUnpack": true
+    },
+    "appId": "info.openacousticdevices.audiomothgpssyncapp",
+    "mac": {
+      "hardenedRuntime": true,
+      "entitlements": "build/entitlements.mac.inherit.plist",
+      "target": "dmg"
+    },
+    "dmg": {
+      "contents": [
+        {
+          "x": 110,
+          "y": 150
+        },
+        {
+          "x": 430,
+          "y": 150,
+          "type": "link",
+          "path": "/Applications"
+        }
+      ],
+      "artifactName": "AudioMothGPSSyncAppSetup${version}.dmg"
+    },
+    "win": {
+      "target": "nsis",
+      "icon": "build/icon.ico"
+    },
+    "nsis": {
+      "createDesktopShortcut": true,
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "artifactName": "AudioMothGPSSyncAppSetup${version}.exe",
+      "shortcutName": "AudioMoth GPS Sync App",
+      "uninstallDisplayName": "AudioMoth GPS Sync App ${version}"
+    },
+    "linux": {
+      "icon": "build/",
+      "category": "Utility"
+    }
+  },
+  "devDependencies": {
+    "electron": "^20.1.4",
+    "eslint": "^7.27.0",
+    "eslint-config-standard": "^14.1.0",
+    "eslint-plugin-import": "^2.22.1",
+    "eslint-plugin-node": "^10.0.0",
+    "eslint-plugin-promise": "^4.3.1",
+    "eslint-plugin-standard": "^4.0.2",
+    "electron-builder": "^22.11.7"
+  },
+  "dependencies": {
+    "@electron/remote": "^2.0.8",
+    "audiomoth-utils": "^1.3.0",
+    "bootstrap": "^4.6.2",
+    "electron-debug": "^3.2.0",
+    "electron-progressbar": "^2.0.1",
+    "jquery": "^3.5.1",
+    "popper.js": "^1.16.1"
+  }
+}

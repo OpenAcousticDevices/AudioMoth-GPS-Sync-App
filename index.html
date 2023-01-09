@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html>
+
+    <head>
+        <link rel="stylesheet" href="./node_modules/bootstrap/dist/css/bootstrap.min.css">
+        <link id="uiCSS" rel="stylesheet" href="ui.css">
+        <title>AudioMoth GPS Sync App</title>
+    </head>
+
+    <body style="font-size: 10pt; overflow-x:hidden; font-family: Helvetica, Arial, sans-serif;-webkit-user-select: none; -webkit-app-region: drag;">
+
+        <div class="container" style="text-align: center; padding: 11px;">
+
+            <div class="fixed-bottom" style="width: 100%; padding: 11px; padding-top: 8px;">
+
+                <div class="row" style="margin-top: 8px;">
+                    <div style="border: #cdcdcd thin solid; margin-left: 15px; width: 543px;">
+
+                        <div class="row" style="margin-top: 8px; margin-bottom: 8px;">
+                            <div class="col-9" style="text-align: left;">
+                                <span id="synced-192-label" style="margin-left: 17px;">Generate synced WAV file at 192kHz:</span>
+                            </div>
+                            <div class="col-3" style="text-align: right;">
+                                <input id="synced-192-checkbox" type="checkbox" style="margin-right: 21px;">
+                            </div>
+                        </div>
+
+                        <div class="row" style="margin-bottom: 8px;">
+                            <div class="col-9" style="text-align: left;">
+                                <span id="auto-resolve-label" style="margin-left: 17px;">Try to auto-resolve issues with poor GPS signal reception:</span>
+                            </div>
+                            <div class="col-3" style="text-align: right;">
+                                <input id="auto-resolve-checkbox" type="checkbox" style="margin-right: 21px;">
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+                <div class="row" style="margin-top: 8px;">
+                    <div style="border: #cdcdcd thin solid; margin-left: 15px; width: 543px;">
+    
+                        <div class="row" style="margin-top: 1%; margin-bottom: 8px;">
+                            <div class="col-12">
+                                <div style="margin-left: 8px; margin-right: 8px">
+                                    <table class="table" style="margin-bottom: 8px;">
+                                        <tr class="settings-text" style="font-size: 12px;" title="Select multiple files or a folder of recordings.">
+                                            <td align="center" style="padding: 0px;"></td>
+                                            <td align="center" style="padding: 0px;"></td>
+                                            <td align="center" style="padding: 0px;"></td>
+                                            <td align="center" style="padding: 0px;"></td>
+                                            <td align="center" style="padding: 0px;"></td>
+                                            <td align="center" style="padding: 0px;"></td>
+                                            <td align="center" style="padding: 0px;"></td>
+                                            <td align="center" style="padding: 0px;" name="selection-radio-label">File</td>
+                                            <td align="center" style="padding: 0px; width: 45px;" name="selection-radio-label">Folder</td>
+                                        </tr>
+                                        <tr class="settings-text" title="Select multiple files or a folder of recordings.">
+                                            <td align="left" style="padding-top: 0px; padding-bottom: 0px;" id="selection-type-label">Selection type:</td>
+                                            <td align="center" style="padding-top: 0px; padding-bottom: 0px"></td>
+                                            <td align="center" style="padding-top: 0px; padding-bottom: 0px"></td>
+                                            <td align="center" style="padding-top: 0px; padding-bottom: 0px"></td>
+                                            <td align="center" style="padding-top: 0px; padding-bottom: 0px"></td>
+                                            <td align="center" style="padding-top: 0px; padding-bottom: 0px"></td>
+                                            <td align="center" style="padding-top: 0px; padding-bottom: 0px"></td>
+                                            <td align="center" style="padding-top: 0px; padding-bottom: 0px">
+                                                <input class="settings-inputs" type="radio" value="0" name="selection-radio" checked>
+                                            </td>
+                                            <td align="center" style="padding-top: 0px; padding-bottom: 0px">
+                                                <input class="settings-inputs" type="radio" value="1" name="selection-radio">
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+    
+                        <div class="row" style="margin-top: 8px; margin-bottom: 8px;">
+                            <div class="col-4">
+                                <button id="file-button" class="btn btn-primary" style="width: 100%; margin-left: 16px;">Select Files</button>
+                            </div>
+                            <div class="col-8">
+                                <div style="margin-top: 11px; text-align: right; margin-right: 16px;">
+                                    <span id="file-label" title="AudioMoth recordings will have a file name ending in '.WAV'.">No AudioMoth WAV files selected.</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row" style="margin-top: 8px;">
+                    <div style="border: #cdcdcd thin solid; margin-left: 15px; width: 543px;">
+                
+                        <div class="row" style="margin-top: 8px; margin-bottom: 8px;">
+                            <div class="col-1">
+                                <input id="prefix-checkbox" type="checkbox" style="margin-left: 16px; margin-top: 9px;">
+                            </div>
+                            <div class="col-5" style="padding-left: 0px;">
+                                <div style="margin-top: 6px; margin-bottom: 0px; text-align: left;">
+                                    <label id="prefix-label" for="prefix-checkbox" title="Prefix which will be added to WAV file to differentiate it from the original file" style="margin-left: 20px;" class="grey">Add WAV file prefix:</label>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div style="text-align: right; margin-top: 2px; margin-bottom: 0px; margin-right: 16px;">
+                                    <input id="prefix-input" maxlength="20" disabled style="text-align: right;" class="grey">
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+                
+                <div class="row" style="margin-top: 8px;">
+                    <div style="border: #cdcdcd thin solid; margin-left: 15px; width: 543px;">
+                
+                        <div class="row" style="margin-top: 12px; margin-bottom: 8px;">
+                            <div class="col-9" style="text-align: left;">
+                                <span style="margin-left: 17px;">Enable destination folder:</span>
+                            </div>
+                            <div class="col-3" style="text-align: right;">
+                                <input id="output-checkbox" type="checkbox" style="margin-right: 21px;">
+                            </div>
+                        </div>
+                
+                        <div class="row" style="margin-bottom: 16px;">
+                            <div class="col-9" style="text-align: left;">
+                                <span class="grey" id="subdirectories-label" style="margin-left: 17px;">Generate subfolders in destination:</span>
+                            </div>
+                            <div class="col-3" style="text-align: right;">
+                                <input id="subdirectories-checkbox" type="checkbox" style="margin-right: 21px;" disabled>
+                            </div>
+                        </div>
+                
+                        <div class="row" style="margin-top: 8px; margin-bottom: 8px;">
+                            <div class="col-4">
+                                <button id="output-button" class="btn btn-primary" style="width: 100%; margin-left: 16px;" disabled>Select Destination</button>
+                            </div>
+                            <div class="col-8">
+                                <div style="margin-top: 11px; text-align: right; margin-right: 16px;">
+                                    <span id="output-label">Writing WAV files to source folder.</span>
+                                </div>
+                            </div>
+                        </div>
+                
+                    </div>
+                </div>
+
+                <div class="row" style="margin-top: 8px;">
+                    <div class="col-12">
+                        <button id="sync-button" class="btn btn-success" disabled style="width: 100%;">Sync Files</button>
+                    </div>
+                </div>
+            </div>
+
+    </body>
+
+    <script>
+        window.jQuery = window.$ = require('jquery');
+    </script>
+    <script src="./node_modules/bootstrap/dist/js/bootstrap.bundle.js"></script>
+    <script src="index.js" charset="utf-8"></script>
+
+</html>
