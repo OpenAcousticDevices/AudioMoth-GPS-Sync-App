@@ -19,8 +19,8 @@ function isOlderSemanticVersion (aVersion, bVersion) {
 
     for (let i = 0; i < aVersion.length; i++) {
 
-        const aVersionNum = aVersion[i];
-        const bVersionNum = bVersion[i];
+        const aVersionNum = parseInt(aVersion[i]);
+        const bVersionNum = parseInt(bVersion[i]);
 
         if (aVersionNum > bVersionNum) {
 
@@ -74,9 +74,17 @@ exports.checkLatestRelease = (callback) => {
 
             /* Compare current version in package.json to latest version pulled from Github */
 
-            const updateNeeded = isOlderSemanticVersion(version, latestVersion);
+            const versionArray = version.split('.');
+            const latestVersionArray = latestVersion.split('.');
+
+            const updateNeeded = isOlderSemanticVersion(versionArray, latestVersionArray);
 
             callback({updateNeeded: updateNeeded, latestVersion: updateNeeded ? latestVersion : version});
+
+        } else if (xmlHttp.status === 404) {
+
+            console.error('Failed to pull release information.');
+            callback({updateNeeded: false, error: 'HTTP connection error, failed to request app version information.'});
 
         }
 

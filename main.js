@@ -18,21 +18,68 @@ require('electron-debug')({
 const path = require('path');
 
 var syncProgressBar;
-var win, aboutWindow;
+var mainWindow, aboutWindow;
 
-function shrinkWindowHeight (windowHeight) {
-
-    if (process.platform === 'darwin') {
-
-        windowHeight -= 20;
-
-    } else if (process.platform === 'linux') {
-
-        windowHeight -= 50;
-
+const iconLocation = (process.platform === 'linux') ? '/build/icon.png' : '/build/icon.ico';
+const standardWindowSettings = {
+    resizable: false,
+    fullscreenable: false,
+    autoHideMenuBar: true,
+    icon: path.join(__dirname, iconLocation),
+    useContentSize: true,
+    webPreferences: {
+        enableRemoteModule: true,
+        nodeIntegration: true,
+        contextIsolation: false
     }
+};
 
-    return windowHeight;
+const standardProgressBarSettings = {
+    closeOnComplete: false,
+    indeterminate: false
+};
+
+/* Generate settings objects for windows and progress bars */
+
+function generateSettings (width, height, title) {
+
+    const uniqueSettings = {
+        width,
+        height,
+        title
+    };
+
+    const settings = Object.assign({}, standardWindowSettings, uniqueSettings);
+    settings.parent = mainWindow;
+
+    return settings;
+
+}
+
+function generateProgressBarSettings (title, text, detail, fileCount, parent) {
+
+    const uniqueSettings = {
+        title,
+        text,
+        detail,
+        maxValue: fileCount * 100
+    };
+
+    const settings = Object.assign({}, standardProgressBarSettings, uniqueSettings);
+
+    settings.browserWindow = {
+        parent,
+        webPreferences: {
+            enableRemoteModule: true,
+            nodeIntegration: true,
+            contextIsolation: false
+        },
+        closable: true,
+        modal: false,
+        height: process.platform === 'linux' ? 140 : 175
+    };
+
+    return settings;
 
 }
 
@@ -40,41 +87,45 @@ function openAboutWindow () {
 
     if (aboutWindow) {
 
+        aboutWindow.show();
         return;
 
     }
 
-    const iconLocation = (process.platform === 'linux') ? '/build/icon.png' : '/build/icon.ico';
+    let windowWidth = 400;
+    let windowHeight = 310;
 
-    aboutWindow = new BrowserWindow({
-        width: 400,
-        height: shrinkWindowHeight(320),
-        title: 'About',
-        resizable: false,
-        fullscreenable: false,
-        icon: path.join(__dirname, iconLocation),
-        parent: win,
-        webPreferences: {
-            enableRemoteModule: true,
-            nodeIntegration: true,
-            contextIsolation: false
-        }
-    });
+    if (process.platform === 'linux') {
+
+        windowWidth = 395;
+        windowHeight = 310;
+
+    } else if (process.platform === 'darwin') {
+
+        windowWidth = 395;
+        windowHeight = 310;
+
+    }
+
+    const settings = generateSettings(windowWidth, windowHeight, 'About');
+    aboutWindow = new BrowserWindow(settings);
 
     aboutWindow.setMenu(null);
     aboutWindow.loadURL(path.join('file://', __dirname, '/about.html'));
 
-    require("@electron/remote/main").enable(aboutWindow.webContents);
+    require('@electron/remote/main').enable(aboutWindow.webContents);
 
-    aboutWindow.on('close', function () {
+    aboutWindow.on('close', (e) => {
 
-        aboutWindow = null;
+        e.preventDefault();
+
+        aboutWindow.hide();
 
     });
 
     aboutWindow.webContents.on('dom-ready', function () {
 
-        win.webContents.send('poll-night-mode');
+        mainWindow.webContents.send('poll-night-mode');
 
     });
 
@@ -92,7 +143,7 @@ function openAboutWindow () {
 
 function toggleNightMode () {
 
-    win.webContents.send('night-mode');
+    mainWindow.webContents.send('night-mode');
 
     if (aboutWindow) {
 
@@ -104,15 +155,25 @@ function toggleNightMode () {
 
 const createWindow = () => {
 
-    const iconLocation = (process.platform === 'linux') ? '/build/icon.png' : '/build/icon.ico';
+    let windowWidth = 565;
+    let windowHeight = 480;
 
-    const w = 565;
-    const h = shrinkWindowHeight(490);
+    if (process.platform === 'linux') {
 
-    win = new BrowserWindow({
-        width: w,
-        height: h,
-        title: 'AudioMoth GPS Sync App (RC1)',
+        windowWidth = 560;
+        windowHeight = 455;
+
+    } else if (process.platform === 'darwin') {
+
+        windowWidth = 560;
+        windowHeight = 458;
+
+    }
+
+    mainWindow = new BrowserWindow({
+        width: windowWidth,
+        height: windowHeight,
+        title: 'AudioMoth GPS Sync App',
         resizable: false,
         fullscreenable: false,
         icon: path.join(__dirname, iconLocation),
@@ -123,13 +184,13 @@ const createWindow = () => {
         }
     });
 
-    win.on('restore', function () {
+    mainWindow.on('restore', function () {
 
         /* When minimised and restored, Windows platforms alter the BrowserWindow such that the height no longer includes the menu bar */
         /* This resize cannot be blocked so this fix resizes it, taking into account the menu change */
         if (process.platform === 'win32') {
 
-            win.setSize(w, h + 20);
+            mainWindow.setSize(w, h + 20);
 
         }
 
@@ -156,25 +217,6 @@ const createWindow = () => {
             }
         }]
     }, {
-        label: 'Edit',
-        submenu: [{
-            label: 'Cut',
-            accelerator: 'CommandOrControl+X',
-            selector: 'cut:'
-        }, {
-            label: 'Copy',
-            accelerator: 'CommandOrControl+C',
-            selector: 'copy:'
-        }, {
-            label: 'Paste',
-            accelerator: 'CommandOrControl+V',
-            selector: 'paste:'
-        }, {
-            label: 'Select All',
-            accelerator: 'CommandOrControl+A',
-            selector: 'selectAll:'
-        }]
-    }, {
         label: 'Help',
         submenu: [{
             label: 'About',
@@ -187,16 +229,16 @@ const createWindow = () => {
             label: 'Check For Updates',
             click: function () {
 
-                win.webContents.send('update-check');
+                mainWindow.webContents.send('update-check');
 
             }
         }, {
             type: 'separator'
         }, {
-            label: 'AudioMoth Filter Playground',
+            label: 'AudioMoth Play Website',
             click: function () {
 
-                shell.openExternal('https://playground.openacousticdevices.info/');
+                shell.openExternal('https://play.openacousticdevices.info/');
 
             }
         }, {
@@ -215,9 +257,9 @@ const createWindow = () => {
 
     Menu.setApplicationMenu(menu);
 
-    win.loadURL(path.join('file://', __dirname, '/index.html'));
+    mainWindow.loadURL(path.join('file://', __dirname, '/index.html'));
 
-    require("@electron/remote/main").enable(win.webContents);
+    require("@electron/remote/main").enable(mainWindow.webContents);
 
 }
 
@@ -257,24 +299,9 @@ ipcMain.on('start-sync-bar', (event, fileCount) => {
     detail += (fileCount > 1) ? 's' : '';
     detail += '.';
 
-    syncProgressBar = new ProgressBar({
-        title: 'AudioMoth GPS Sync App',
-        text: 'Syncing files...',
-        detail: detail,
-        closeOnComplete: false,
-        indeterminate: false,
-        browserWindow: {
-            parent: win,
-            webPreferences: {
-                enableRemoteModule: true,
-                nodeIntegration: true,
-                contextIsolation: false
-            },
-            closable: true,
-            modal: false
-        },
-        maxValue: fileCount * 100
-    });
+    const settings = generateProgressBarSettings('AudioMoth GPS Sync App', 'Syncing files...', detail, fileCount, mainWindow);
+
+    syncProgressBar = new ProgressBar(settings);
 
     syncProgressBar.on('aborted', () => {
 
@@ -361,9 +388,9 @@ ipcMain.on('set-sync-bar-completed', (event, successCount, errorCount, errorWrit
             syncProgressBar.close();
             syncProgressBar = null;
 
-            if (win) {
+            if (mainWindow) {
 
-                win.send('sync-summary-closed');
+                mainWindow.send('sync-summary-closed');
 
             }
 

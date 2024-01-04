@@ -1,6 +1,6 @@
 {
   "name": "AudioMoth-Sync",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "The file synchronisation app for recordings made using the AudioMoth-GPS-Sync firmware.",
   "main": "main.js",
   "author": "openacousticdevices.info",
@@ -57,22 +57,22 @@
     }
   },
   "devDependencies": {
-    "electron": "^20.1.4",
+    "electron": "25.3.2",
+    "electron-builder": "^24.6.3",
     "eslint": "^7.27.0",
     "eslint-config-standard": "^14.1.0",
     "eslint-plugin-import": "^2.22.1",
     "eslint-plugin-node": "^10.0.0",
     "eslint-plugin-promise": "^4.3.1",
-    "eslint-plugin-standard": "^4.0.2",
-    "electron-builder": "^22.11.7"
+    "eslint-plugin-standard": "^4.0.2"
   },
   "dependencies": {
-    "@electron/remote": "^2.0.8",
-    "audiomoth-utils": "^1.3.0",
-    "bootstrap": "^4.6.2",
+    "@electron/remote": "^2.0.10",
+    "@popperjs/core": "^2.11.8",
+    "audiomoth-utils": "^1.4.1",
+    "bootstrap": "5.3.1",
     "electron-debug": "^3.2.0",
     "electron-progressbar": "^2.0.1",
-    "jquery": "^3.5.1",
-    "popper.js": "^1.16.1"
+    "jquery": "^3.7.0"
   }
 }
