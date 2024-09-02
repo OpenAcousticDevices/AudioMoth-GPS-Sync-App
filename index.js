@@ -23,8 +23,6 @@ const audiomothUtils = require('audiomoth-utils');
 
 var currentWindow = getCurrentWindow();
 
-const FILE_REGEX = /^(\d\d\d\d\d\d\d\d_)?\d\d\d\d\d\d.WAV$/;
-
 const selectionRadios = document.getElementsByName('selection-radio');
 
 const prefixCheckbox = document.getElementById('prefix-checkbox');
@@ -398,7 +396,9 @@ selectionRadios[1].addEventListener('change', resetUI);
 
 fileButton.addEventListener('click', () => {
 
-    files = uiOutput.selectRecordings(FILE_REGEX);
+    const fileRegex = audiomothUtils.getFilenameRegex(audiomothUtils.SYNC);
+
+    files = uiOutput.selectRecordings(fileRegex);
 
     if (files !== undefined) {
 
@@ -466,7 +466,7 @@ electron.ipcRenderer.on('update-check', function () {
 
         if (buttonIndex === 0) {
 
-            electron.shell.openExternal('https://www.openacousticdevices.info/applications');
+            electron.shell.openExternal('https://www.openacousticdevices.info/gps-sync');
 
         }
 

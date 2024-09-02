@@ -9,7 +9,7 @@
 /* global document */
 
 const electron = require('electron');
-const { app, process } = require('@electron/remote');
+const {app, process} = require('@electron/remote');
 
 const nightMode = require('./nightMode.js');
 
