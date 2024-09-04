@@ -4,7 +4,7 @@
  * September 2022
  *****************************************************************************/
 
-const { app, BrowserWindow, ipcMain, Menu, shell } = require('electron');
+const {app, BrowserWindow, ipcMain, Menu, shell} = require('electron');
 
 const ProgressBar = require('electron-progressbar');
 
@@ -190,7 +190,7 @@ const createWindow = () => {
         /* This resize cannot be blocked so this fix resizes it, taking into account the menu change */
         if (process.platform === 'win32') {
 
-            mainWindow.setSize(w, h + 20);
+            mainWindow.setSize(windowWidth, windowHeight + 20);
 
         }
 
@@ -259,9 +259,9 @@ const createWindow = () => {
 
     mainWindow.loadURL(path.join('file://', __dirname, '/index.html'));
 
-    require("@electron/remote/main").enable(mainWindow.webContents);
+    require('@electron/remote/main').enable(mainWindow.webContents);
 
-}
+};
 
 app.whenReady().then(() => {
 
@@ -328,10 +328,10 @@ ipcMain.on('set-sync-bar-progress', (event, fileNum, progress) => {
 
 ipcMain.on('set-sync-bar-file', (event, fileNum, name) => {
 
-    const index = fileNum + 1;
-    const fileCount = syncProgressBar.getOptions().maxValue / 100;
-
     if (syncProgressBar) {
+
+        const index = fileNum + 1;
+        const fileCount = syncProgressBar.getOptions().maxValue / 100;
 
         syncProgressBar.detail = 'Syncing ' + name + ' (' + index + ' of ' + fileCount + ').';
 
