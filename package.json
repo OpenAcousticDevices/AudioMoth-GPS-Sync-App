@@ -1,6 +1,6 @@
 {
   "name": "AudioMoth-Sync",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "The file synchronisation app for recordings made using the AudioMoth-GPS-Sync firmware.",
   "main": "main.js",
   "author": "openacousticdevices.info",
@@ -69,7 +69,7 @@
   "dependencies": {
     "@electron/remote": "^2.0.10",
     "@popperjs/core": "^2.11.8",
-    "audiomoth-utils": "^1.6.1",
+    "audiomoth-utils": "^1.7.1",
     "bootstrap": "5.3.1",
     "electron-debug": "^3.2.0",
     "electron-progressbar": "^2.0.1",
