@@ -29,7 +29,8 @@ const prefixCheckbox = document.getElementById('prefix-checkbox');
 const prefixInput = document.getElementById('prefix-input');
 
 const synced192Checkbox = document.getElementById('synced-192-checkbox');
-const autoResolveCheckbox = document.getElementById('auto-resolve-checkbox');
+const resolveWAVCheckbox = document.getElementById('resolve-WAV-checkbox');
+const resolveGPSCheckbox = document.getElementById('resolve-GPS-checkbox');
 
 const fileLabel = document.getElementById('file-label');
 const fileButton = document.getElementById('file-button');
@@ -111,7 +112,8 @@ function disableUI () {
     selectionRadios[1].disabled = true;
 
     synced192Checkbox.disabled = true;
-    autoResolveCheckbox.disabled = true;
+    resolveWAVCheckbox.disabled = true;
+    resolveGPSCheckbox.disabled = true;
 
     uiOutput.disableOutputCheckbox();
     uiOutput.disableOutputButton();
@@ -129,7 +131,8 @@ function enableUI () {
     selectionRadios[1].disabled = false;
 
     synced192Checkbox.disabled = false;
-    autoResolveCheckbox.disabled = false;
+    resolveWAVCheckbox.disabled = false;
+    resolveGPSCheckbox.disabled = false;
 
     uiOutput.enableOutputCheckbox();
     uiOutput.enableOutputButton();
@@ -222,9 +225,10 @@ function syncFiles () {
         const prefix = (prefixCheckbox.checked && prefixInput.value !== '') ? prefixInput.value : null;
 
         const resample = synced192Checkbox.checked;
-        const autoResolve = autoResolveCheckbox.checked;
+        const resolveWAV = resolveWAVCheckbox.checked;
+        const resolveGPS = resolveGPSCheckbox.checked;
 
-        const response = audiomothUtils.sync(files[i], outputPath, prefix, resample ? RESAMPLE_RATE : null, autoResolve, (progress) => {
+        const response = audiomothUtils.sync(files[i], outputPath, prefix, resample ? RESAMPLE_RATE : null, resolveWAV, resolveGPS, (progress) => {
 
             electron.ipcRenderer.send('set-sync-bar-progress', i, progress);
             electron.ipcRenderer.send('set-sync-bar-file', i, path.basename(files[i]));
@@ -398,9 +402,11 @@ fileButton.addEventListener('click', () => {
 
     const fileRegex = audiomothUtils.getFilenameRegex(audiomothUtils.SYNC);
 
-    files = uiOutput.selectRecordings(fileRegex);
+    const newFiles = uiOutput.selectRecordings(fileRegex);
 
-    if (files !== undefined) {
+    if (newFiles !== undefined) {
+
+        files = newFiles;
 
         updateInputDirectoryDisplay(files);
         

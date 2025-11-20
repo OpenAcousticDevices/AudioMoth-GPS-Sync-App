@@ -156,17 +156,17 @@ function toggleNightMode () {
 const createWindow = () => {
 
     let windowWidth = 565;
-    let windowHeight = 480;
+    let windowHeight = 510;
 
     if (process.platform === 'linux') {
 
         windowWidth = 560;
-        windowHeight = 455;
+        windowHeight = 485;
 
     } else if (process.platform === 'darwin') {
 
         windowWidth = 560;
-        windowHeight = 458;
+        windowHeight = 488;
 
     }
 
