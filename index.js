@@ -6,10 +6,8 @@
 
 'use strict';
 
-/* global document */
-
 const electron = require('electron');
-const { dialog, getCurrentWindow } = require('@electron/remote');
+const {dialog, getCurrentWindow} = require('@electron/remote');
 
 const nightMode = require('./nightMode.js');
 const versionChecker = require('./versionChecker.js');
@@ -21,7 +19,7 @@ const fs = require('fs');
 
 const audiomothUtils = require('audiomoth-utils');
 
-var currentWindow = getCurrentWindow();
+const currentWindow = getCurrentWindow();
 
 const selectionRadios = document.getElementsByName('selection-radio');
 
@@ -36,8 +34,8 @@ const fileLabel = document.getElementById('file-label');
 const fileButton = document.getElementById('file-button');
 const syncButton = document.getElementById('sync-button');
 
-var files = [];
-var syncing = false;
+let files = [];
+let syncing = false;
 
 const RESAMPLE_RATE = 192000;
 
@@ -74,7 +72,7 @@ electron.ipcRenderer.on('poll-night-mode', function () {
 function sleep (milliseconds) {
 
     const date = Date.now();
-    let currentDate = null;
+    let currentDate;
 
     do {
 

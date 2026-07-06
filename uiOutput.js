@@ -6,9 +6,7 @@
 
 'use strict';
 
-/* global document */
-
-const { dialog, getCurrentWindow } = require('@electron/remote');
+const {dialog, getCurrentWindow} = require('@electron/remote');
 const currentWindow = getCurrentWindow();
 
 const path = require('path');
@@ -21,7 +19,7 @@ const outputLabel = document.getElementById('output-label');
 const subdirectoriesLabel = document.getElementById('subdirectories-label');
 const subdirectoriesCheckbox = document.getElementById('subdirectories-checkbox');
 
-var outputDir = '';
+let outputDir = '';
 
 const prefixInput = document.getElementById('prefix-input');
 const prefixCheckbox = document.getElementById('prefix-checkbox');
@@ -189,7 +187,7 @@ prefixInput.addEventListener('keydown', (e) => {
 
     }
 
-    var reg = /[^A-Za-z-_0-9]{1}/g;
+    const reg = /[^A-Za-z-_0-9]{1}/g;
 
     if (reg.test(e.key)) {
 

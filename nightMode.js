@@ -6,9 +6,9 @@
 
 'use strict';
 
-const { app } = require('@electron/remote');
+const {app} = require('@electron/remote');
 
-var nightMode = false;
+let nightMode = false;
 
 exports.isEnabled = () => {
 

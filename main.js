@@ -4,21 +4,20 @@
  * September 2022
  *****************************************************************************/
 
+/* global process, __dirname */
+
 const {app, BrowserWindow, ipcMain, Menu, shell} = require('electron');
 
-const ProgressBar = require('electron-progressbar');
+const remoteMain = require('@electron/remote/main');
+remoteMain.initialize();
 
-require('@electron/remote/main').initialize();
-
-require('electron-debug')({
-    showDevTools: true,
-    devToolsMode: 'undocked'
-});
+const electronDebug = require('electron-debug');
 
 const path = require('path');
 
-var syncProgressBar;
-var mainWindow, aboutWindow;
+let mainWindow, aboutWindow, progressBarWindow;
+let progressBarMaxValue = 100;
+let allowProgressWindowClose = false;
 
 const iconLocation = (process.platform === 'linux') ? '/build/icon.png' : '/build/icon.ico';
 const standardWindowSettings = {
@@ -28,15 +27,10 @@ const standardWindowSettings = {
     icon: path.join(__dirname, iconLocation),
     useContentSize: true,
     webPreferences: {
-        enableRemoteModule: true,
+        contextIsolation: false,
         nodeIntegration: true,
-        contextIsolation: false
+        sandbox: false
     }
-};
-
-const standardProgressBarSettings = {
-    closeOnComplete: false,
-    indeterminate: false
 };
 
 /* Generate settings objects for windows and progress bars */
@@ -51,33 +45,6 @@ function generateSettings (width, height, title) {
 
     const settings = Object.assign({}, standardWindowSettings, uniqueSettings);
     settings.parent = mainWindow;
-
-    return settings;
-
-}
-
-function generateProgressBarSettings (title, text, detail, fileCount, parent) {
-
-    const uniqueSettings = {
-        title,
-        text,
-        detail,
-        maxValue: fileCount * 100
-    };
-
-    const settings = Object.assign({}, standardProgressBarSettings, uniqueSettings);
-
-    settings.browserWindow = {
-        parent,
-        webPreferences: {
-            enableRemoteModule: true,
-            nodeIntegration: true,
-            contextIsolation: false
-        },
-        closable: true,
-        modal: false,
-        height: process.platform === 'linux' ? 140 : 175
-    };
 
     return settings;
 
@@ -110,10 +77,22 @@ function openAboutWindow () {
     const settings = generateSettings(windowWidth, windowHeight, 'About');
     aboutWindow = new BrowserWindow(settings);
 
-    aboutWindow.setMenu(null);
-    aboutWindow.loadURL(path.join('file://', __dirname, '/about.html'));
-
     require('@electron/remote/main').enable(aboutWindow.webContents);
+
+    aboutWindow.setMenu(null);
+    aboutWindow.loadFile('about.html');
+
+    if (!app.isPackaged) {
+
+        electronDebug.openDevTools(aboutWindow);
+
+    }
+
+    aboutWindow.webContents.on('dom-ready', () => {
+
+        mainWindow.webContents.send('poll-night-mode');
+
+    });
 
     aboutWindow.on('close', (e) => {
 
@@ -123,19 +102,9 @@ function openAboutWindow () {
 
     });
 
-    aboutWindow.webContents.on('dom-ready', function () {
+    aboutWindow.webContents.on('dom-ready', () => {
 
         mainWindow.webContents.send('poll-night-mode');
-
-    });
-
-    ipcMain.on('night-mode-poll-reply', (e, nightMode) => {
-
-        if (aboutWindow) {
-
-            aboutWindow.webContents.send('night-mode', nightMode);
-
-        }
 
     });
 
@@ -153,20 +122,20 @@ function toggleNightMode () {
 
 }
 
-const createWindow = () => {
+app.on('ready', () => {
 
     let windowWidth = 565;
-    let windowHeight = 510;
+    let windowHeight = 525;
 
     if (process.platform === 'linux') {
 
         windowWidth = 560;
-        windowHeight = 485;
+        windowHeight = 522;
 
     } else if (process.platform === 'darwin') {
 
         windowWidth = 560;
-        windowHeight = 488;
+        windowHeight = 492;
 
     }
 
@@ -180,21 +149,13 @@ const createWindow = () => {
         webPreferences: {
             enableRemoteModule: true,
             nodeIntegration: true,
-            contextIsolation: false
+            contextIsolation: false,
+            backgroundThrottling: false
         }
     });
 
-    mainWindow.on('restore', function () {
-
-        /* When minimised and restored, Windows platforms alter the BrowserWindow such that the height no longer includes the menu bar */
-        /* This resize cannot be blocked so this fix resizes it, taking into account the menu change */
-        if (process.platform === 'win32') {
-
-            mainWindow.setSize(windowWidth, windowHeight + 20);
-
-        }
-
-    });
+    // TODO: This line fixes this issue: https://github.com/electron/electron/issues/51465 Check to see if still broken
+    mainWindow.setSize(windowWidth, windowHeight);
 
     const menuTemplate = [{
         label: 'File',
@@ -257,25 +218,15 @@ const createWindow = () => {
 
     Menu.setApplicationMenu(menu);
 
-    mainWindow.loadURL(path.join('file://', __dirname, '/index.html'));
-
     require('@electron/remote/main').enable(mainWindow.webContents);
 
-};
+    mainWindow.loadFile('index.html');
 
-app.whenReady().then(() => {
+    if (!app.isPackaged) {
 
-    createWindow();
+        electronDebug.openDevTools(mainWindow);
 
-    app.on('activate', () => {
-
-        if (BrowserWindow.getAllWindows().length === 0) {
-
-            createWindow();
-
-        }
-
-    });
+    }
 
 });
 
@@ -285,55 +236,138 @@ app.on('window-all-closed', () => {
 
 });
 
+function createProgressBar (windowTitle, heading, detail, maxValue) {
+
+    if (!progressBarWindow) {
+
+        let windowWidth = 500;
+        const windowHeight = 160;
+
+        if (process.platform === 'linux') {
+
+            windowWidth = 495;
+
+        } else if (process.platform === 'darwin') {
+
+            windowWidth = 495;
+
+        }
+
+        const settings = generateSettings(windowWidth, windowHeight, '');
+        progressBarWindow = new BrowserWindow({
+            ...settings,
+            modal: true,
+            parent: mainWindow
+        });
+
+        require('@electron/remote/main').enable(progressBarWindow.webContents);
+
+        progressBarWindow.setMenu(null);
+        progressBarWindow.loadFile('progressBar.html');
+
+        if (!app.isPackaged) {
+
+            electronDebug.openDevTools(progressBarWindow);
+
+        }
+
+        allowProgressWindowClose = false;
+
+        progressBarWindow.on('close', (e) => {
+
+            if (!allowProgressWindowClose) {
+
+                e.preventDefault();
+
+            }
+
+        });
+
+    } else {
+
+        progressBarWindow.show();
+
+    }
+
+    setTimeout(() => {
+
+        progressBarWindow.webContents.send('create-progress-bar', {
+            windowTitle,
+            heading,
+            detail,
+            maxValue
+        });
+
+        progressBarMaxValue = maxValue;
+
+    }, 250);
+
+}
+
+function setProgressBarValue (newValue) {
+
+    if (progressBarWindow) {
+
+        progressBarWindow.webContents.send('set-progress-bar-value', newValue);
+
+    }
+
+}
+
+function pollCancelled (event) {
+
+    if (progressBarWindow) {
+
+        event.returnValue = false;
+
+    } else {
+
+        event.returnValue = true;
+
+    }
+
+}
+
+function closeProgressBarWindow () {
+
+    if (progressBarWindow) {
+
+        allowProgressWindowClose = true;
+        progressBarWindow.close();
+        progressBarWindow = null;
+
+    }
+
+}
+
+ipcMain.on('close-progress-bar', closeProgressBarWindow);
+
 /* Syncing progress bar functions */
 
 ipcMain.on('start-sync-bar', (event, fileCount) => {
-
-    if (syncProgressBar) {
-
-        return;
-
-    }
 
     let detail = 'Starting to sync file';
     detail += (fileCount > 1) ? 's' : '';
     detail += '.';
 
-    const settings = generateProgressBarSettings('AudioMoth GPS Sync App', 'Syncing files...', detail, fileCount, mainWindow);
-
-    syncProgressBar = new ProgressBar(settings);
-
-    syncProgressBar.on('aborted', () => {
-
-        if (syncProgressBar) {
-
-            syncProgressBar.close();
-            syncProgressBar = null;
-
-        }
-
-    });
+    createProgressBar('AudioMoth GPS Sync App', 'Syncing files...', detail, fileCount);
 
 });
 
 ipcMain.on('set-sync-bar-progress', (event, fileNum, progress) => {
 
-    if (syncProgressBar) {
-
-        syncProgressBar.value = (fileNum * 100) + progress;
-
-    }
+    setProgressBarValue((fileNum * 100) + progress);
 
 });
 
 ipcMain.on('set-sync-bar-file', (event, fileNum, name) => {
 
-    if (syncProgressBar) {
+    if (progressBarWindow) {
 
         const index = fileNum + 1;
-        const fileCount = syncProgressBar.getOptions().maxValue / 100;
+        const fileCount = progressBarMaxValue / 100;
 
-        syncProgressBar.detail = 'Syncing ' + name + ' (' + index + ' of ' + fileCount + ').';
+        progressBarWindow.webContents.send('set-progress-bar-detail', 'Syncing ' + name + ' (' + index + ' of ' + fileCount + ').');
 
     }
 
@@ -341,9 +375,9 @@ ipcMain.on('set-sync-bar-file', (event, fileNum, name) => {
 
 ipcMain.on('set-sync-bar-error', (event, name) => {
 
-    if (syncProgressBar) {
+    if (progressBarWindow) {
 
-        syncProgressBar.detail = 'Error when syncing ' + name + '.';
+        progressBarWindow.webContents.send('set-progress-bar-detail', 'Error when syncing ' + name + '.');
 
     }
 
@@ -351,11 +385,11 @@ ipcMain.on('set-sync-bar-error', (event, name) => {
 
 ipcMain.on('set-sync-bar-completed', (event, successCount, errorCount, errorWritingLog) => {
 
-    if (syncProgressBar) {
+    if (progressBarWindow) {
 
         let messageText;
 
-        syncProgressBar.setCompleted();
+        progressBarWindow.webContents.send('set-progress-bar-completed');
 
         if (errorCount > 0) {
 
@@ -381,12 +415,11 @@ ipcMain.on('set-sync-bar-completed', (event, successCount, errorCount, errorWrit
 
         }
 
-        syncProgressBar.detail = messageText;
+        progressBarWindow.webContents.send('set-progress-bar-detail', messageText);
 
         setTimeout(function () {
 
-            syncProgressBar.close();
-            syncProgressBar = null;
+            closeProgressBarWindow();
 
             if (mainWindow) {
 
@@ -400,16 +433,4 @@ ipcMain.on('set-sync-bar-completed', (event, successCount, errorCount, errorWrit
 
 });
 
-ipcMain.on('poll-sync-cancelled', (event) => {
-
-    if (syncProgressBar) {
-
-        event.returnValue = false;
-
-    } else {
-
-        event.returnValue = true;
-
-    }
-
-});
+ipcMain.on('poll-sync-cancelled', pollCancelled);

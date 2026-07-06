@@ -6,10 +6,7 @@
 
 'use strict';
 
-/* global XMLHttpRequest */
-
-const electron = require('electron');
-const { app } = require('@electron/remote');
+const {app} = require('@electron/remote');
 
 const pjson = require('./package.json');
 
