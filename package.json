@@ -1,6 +1,6 @@
 {
   "name": "AudioMoth-Sync",
-  "version": "1.1.1",
+  "version": "1.2.0",
   "description": "The file synchronisation app for recordings made using the AudioMoth-GPS-Sync firmware.",
   "main": "main.js",
   "author": "openacousticdevices.info <theteam@openacousticdevices.info>",

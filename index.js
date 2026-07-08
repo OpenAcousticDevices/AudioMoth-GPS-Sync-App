@@ -23,6 +23,9 @@ const currentWindow = getCurrentWindow();
 
 const selectionRadios = document.getElementsByName('selection-radio');
 
+const algorithmSelect = document.getElementById('algorithm-select');
+const RESAMPLING_ALGORITHMS = [audiomothUtils.aligner.INTERPOLATION, audiomothUtils.aligner.NEAREST_NEIGHBOUR];
+
 const prefixCheckbox = document.getElementById('prefix-checkbox');
 const prefixInput = document.getElementById('prefix-input');
 
@@ -226,7 +229,9 @@ function syncFiles () {
         const resolveWAV = resolveWAVCheckbox.checked;
         const resolveGPS = resolveGPSCheckbox.checked;
 
-        const response = audiomothUtils.sync(files[i], outputPath, prefix, resample ? RESAMPLE_RATE : null, resolveWAV, resolveGPS, (progress) => {
+        const algorithm = RESAMPLING_ALGORITHMS[parseInt(algorithmSelect.value)];
+
+        const response = audiomothUtils.sync(files[i], outputPath, prefix, algorithm, resample ? RESAMPLE_RATE : null, resolveWAV, resolveGPS, (progress) => {
 
             electron.ipcRenderer.send('set-sync-bar-progress', i, progress);
             electron.ipcRenderer.send('set-sync-bar-file', i, path.basename(files[i]));

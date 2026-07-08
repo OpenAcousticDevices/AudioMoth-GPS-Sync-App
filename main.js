@@ -125,17 +125,17 @@ function toggleNightMode () {
 app.on('ready', () => {
 
     let windowWidth = 565;
-    let windowHeight = 525;
+    let windowHeight = 568;
 
     if (process.platform === 'linux') {
 
         windowWidth = 560;
-        windowHeight = 522;
+        windowHeight = 565;
 
     } else if (process.platform === 'darwin') {
 
         windowWidth = 560;
-        windowHeight = 492;
+        windowHeight = 535;
 
     }
 
