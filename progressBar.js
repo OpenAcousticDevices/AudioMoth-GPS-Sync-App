@@ -76,9 +76,9 @@ function setWindowTitle (windowTitle) {
 
 }
 
-electron.ipcRenderer.on('create-progress-bar', (event, {windowTitle, heading, detail, maxValue, cancelable}) => {
+electron.ipcRenderer.on('create-progress-bar', (event, {windowTitle, heading, detail, maxValue}) => {
 
-    createProgressBar(windowTitle, heading, detail, maxValue, cancelable);
+    createProgressBar(windowTitle, heading, detail, maxValue, false);
 
 });
 

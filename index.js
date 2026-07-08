@@ -231,7 +231,7 @@ function syncFiles () {
 
         const algorithm = RESAMPLING_ALGORITHMS[parseInt(algorithmSelect.value)];
 
-        const response = audiomothUtils.sync(files[i], outputPath, prefix, algorithm, resample ? RESAMPLE_RATE : null, resolveWAV, resolveGPS, (progress) => {
+        const response = audiomothUtils.syncer.sync(files[i], outputPath, prefix, algorithm, resample ? RESAMPLE_RATE : null, resolveWAV, resolveGPS, (progress) => {
 
             electron.ipcRenderer.send('set-sync-bar-progress', i, progress);
             electron.ipcRenderer.send('set-sync-bar-file', i, path.basename(files[i]));
