@@ -365,9 +365,8 @@ ipcMain.on('set-sync-bar-file', (event, fileNum, name) => {
     if (progressBarWindow) {
 
         const index = fileNum + 1;
-        const fileCount = progressBarMaxValue / 100;
 
-        progressBarWindow.webContents.send('set-progress-bar-detail', 'Syncing ' + name + ' (' + index + ' of ' + fileCount + ').');
+        progressBarWindow.webContents.send('set-progress-bar-detail', 'Syncing ' + name + ' (' + index + ' of ' + progressBarMaxValue + ').');
 
     }
 
