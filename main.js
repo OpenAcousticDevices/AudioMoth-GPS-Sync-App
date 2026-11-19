@@ -74,7 +74,7 @@ function openAboutWindow () {
 
     }
 
-    const settings = generateSettings(windowWidth, windowHeight, 'About');
+    const settings = generateSettings(windowWidth, windowHeight, 'About AudioMoth GPS Sync App');
     aboutWindow = new BrowserWindow(settings);
 
     require('@electron/remote/main').enable(aboutWindow.webContents);
@@ -88,12 +88,6 @@ function openAboutWindow () {
 
     }
 
-    aboutWindow.webContents.on('dom-ready', () => {
-
-        mainWindow.webContents.send('poll-night-mode');
-
-    });
-
     aboutWindow.on('close', (e) => {
 
         e.preventDefault();
@@ -105,6 +99,16 @@ function openAboutWindow () {
     aboutWindow.webContents.on('dom-ready', () => {
 
         mainWindow.webContents.send('poll-night-mode');
+
+    });
+
+    ipcMain.on('night-mode-poll-reply', (e, nightMode) => {
+
+        if (aboutWindow) {
+
+            aboutWindow.webContents.send('night-mode', nightMode);
+
+        }
 
     });
 
